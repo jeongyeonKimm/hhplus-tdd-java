@@ -23,15 +23,12 @@ class PointServiceTest {
     @DisplayName("id에 해당하는 사용자 포인트를 조회한다.")
     @Test
     void getUserPoint() {
-        // given
         long updateMillis = System.currentTimeMillis();
         UserPoint userPoint = new UserPoint(1L, 1000L, updateMillis);
         given(userPointTable.selectById(1L)).willReturn(userPoint);
 
-        // when
         UserPoint result = pointService.getUserPoint(1L);
 
-        // then
         assertThat(result)
                 .extracting("id", "point", "updateMillis")
                 .contains(1L, 1000L, updateMillis);
