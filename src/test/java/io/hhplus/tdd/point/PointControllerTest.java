@@ -52,6 +52,10 @@ class PointControllerTest {
                 .andExpect(jsonPath("$[0].userId").value(userId))
                 .andExpect(jsonPath("$[0].amount").value(pointHistory1.amount()))
                 .andExpect(jsonPath("$[0].type").value(pointHistory1.type().toString()))
+                .andExpect(jsonPath("$[1].id").value(pointHistory2.id()))
+                .andExpect(jsonPath("$[1].userId").value(userId))
+                .andExpect(jsonPath("$[1].amount").value(pointHistory2.amount()))
+                .andExpect(jsonPath("$[1].type").value(pointHistory2.type().toString()))
                 .andDo(print());
     }
 }
