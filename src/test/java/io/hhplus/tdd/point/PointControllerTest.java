@@ -18,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,5 +68,18 @@ class PointControllerTest {
             assertThat(body.get(i).amount()).isEqualTo(pointHistories.get(i).amount());
             assertThat(body.get(i).type()).isEqualTo(pointHistories.get(i).type());
         }
+    }
+    
+    @DisplayName("충전/사용 내역이 없는 경우 빈 리스트를 반환한다.")
+    @Test
+    void getUserPointHistory_returnsEmptyList_whenNoHistoryExists() throws Exception {
+        long userId = 1L;
+        given(pointService.getUserPointHistory(userId)).willReturn(List.of());
+
+        mockMvc.perform(
+                        get("/point/{id}/histories", userId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 }
