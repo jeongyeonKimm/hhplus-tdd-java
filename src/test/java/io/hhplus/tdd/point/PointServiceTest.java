@@ -1,6 +1,5 @@
 package io.hhplus.tdd.point;
 
-import io.hhplus.tdd.database.UserPointTable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,21 +19,22 @@ class PointServiceTest {
     private PointService pointService;
 
     @Mock
-    private UserPointTable userPointTable;
+    private PointRepository pointRepository;
 
     @DisplayName("id에 해당하는 사용자 포인트를 조회한다.")
     @Test
     void getUserPoint() {
         long updateMillis = System.currentTimeMillis();
-        UserPoint userPoint = new UserPoint(1L, 1000L, updateMillis);
-        given(userPointTable.selectById(1L)).willReturn(userPoint);
+        long id = 1L;
+        UserPoint userPoint = new UserPoint(id, 1000L, updateMillis);
+        given(pointRepository.findUserPointById(id)).willReturn(userPoint);
 
-        UserPoint result = pointService.getUserPoint(1L);
+        UserPoint result = pointService.getUserPoint(id);
 
         assertThat(result)
                 .extracting("id", "point", "updateMillis")
-                .contains(1L, 1000L, updateMillis);
+                .contains(id, 1000L, updateMillis);
 
-        verify(userPointTable, times(1)).selectById(1L);
+        verify(pointRepository, times(1)).findUserPointById(id);
     }
 }

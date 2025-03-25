@@ -1,6 +1,5 @@
 package io.hhplus.tdd.point;
 
-import io.hhplus.tdd.database.UserPointTable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +7,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class PointService {
 
-    private final UserPointTable userPointTable;
+    private final PointRepository pointRepository;
 
     public UserPoint getUserPoint(long userPointId) {
-        return userPointTable.selectById(userPointId);
+        return pointRepository.findUserPointById(userPointId);
     }
 }
