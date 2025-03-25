@@ -51,4 +51,14 @@ class UserPointTest {
         assertThat(afterCharge.id()).isEqualTo(userPoint.id());
         assertThat(afterCharge.point()).isEqualTo(expectedAmount);
     }
+    
+    @DisplayName("유저 포인트 생성 시 포인트 값은 음수이면 NegativePointAmountException이 발생한다.")
+    @Test
+    void constructor_shouldThrowException_whenPointIsNegative() {
+        long negativePoint = -100L;
+
+        assertThatThrownBy(() -> new UserPoint(1L, negativePoint, System.currentTimeMillis()))
+                .isInstanceOf(NegativePointAmountException.class)
+                .hasMessage("포인트는 음수가 될 수 없습니다.");
+    }
 }
