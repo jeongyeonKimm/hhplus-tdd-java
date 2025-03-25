@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point;
 
+import io.hhplus.tdd.exception.NegativePointAmountException;
 import io.hhplus.tdd.exception.NonPositiveChargeAmountException;
 import io.hhplus.tdd.exception.PointLimitExceededException;
 import org.junit.jupiter.api.DisplayName;

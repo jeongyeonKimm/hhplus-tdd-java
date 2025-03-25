@@ -1,5 +1,6 @@
 package io.hhplus.tdd.point;
 
+import io.hhplus.tdd.exception.NegativePointAmountException;
 import io.hhplus.tdd.exception.NonPositiveChargeAmountException;
 import io.hhplus.tdd.exception.PointLimitExceededException;
 
@@ -10,6 +11,12 @@ public record UserPoint(
 ) {
 
     private static final long MAX_POINT = 1_000_000L;
+
+    public UserPoint {
+        if (point < 0) {
+            throw new NegativePointAmountException();
+        }
+    }
 
     public static UserPoint empty(long id) {
         return new UserPoint(id, 0, System.currentTimeMillis());
