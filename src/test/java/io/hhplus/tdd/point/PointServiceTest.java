@@ -1,6 +1,5 @@
 package io.hhplus.tdd.point;
 
-import io.hhplus.tdd.database.PointHistoryTable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +25,6 @@ class PointServiceTest {
     @Mock
     private PointRepository pointRepository;
 
-    @Mock
-    private PointHistoryTable pointHistoryTable;
-
     @DisplayName("id에 해당하는 사용자 포인트를 조회한다.")
     @Test
     void getUserPoint() {
@@ -52,7 +48,7 @@ class PointServiceTest {
         long userId = 1L;
         PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, TransactionType.CHARGE, System.currentTimeMillis());
         PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, TransactionType.USE, System.currentTimeMillis());
-        given(pointHistoryTable.selectAllByUserId(userId)).willReturn(List.of(pointHistory1, pointHistory2));
+        given(pointRepository.findPointHistoriesByUserId(userId)).willReturn(List.of(pointHistory1, pointHistory2));
 
         List<PointHistory> results = pointService.getUserPointHistory(userId);
 
@@ -63,6 +59,6 @@ class PointServiceTest {
                         tuple(3L, userId, 500L, TransactionType.USE)
                 );
 
-        verify(pointHistoryTable, times(1)).selectAllByUserId(userId);
+        verify(pointRepository, times(1)).findPointHistoriesByUserId(userId);
     }
 }
