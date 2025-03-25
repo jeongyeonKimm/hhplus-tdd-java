@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,5 +65,31 @@ class PointServiceTest {
                 );
 
         verify(pointRepository, times(1)).findPointHistoriesByUserId(userId);
+    }
+
+    @DisplayName("0 초과이고 이미 보유한 포인트와의 합이 최대 포인트 이하인 금액만큼 포인트를 충전한다.")
+    @Test
+    void chargePoint() {
+        long userId = 1L;
+        long currentPoint = 500_000L;
+        long chargeAmount = 300_000L;
+
+        UserPoint userPoint = new UserPoint(userId, currentPoint, System.currentTimeMillis());
+        UserPoint chargedUserPoint = userPoint.charge(chargeAmount);
+        PointHistory pointHistory = new PointHistory(2L, userId, chargeAmount, CHARGE, System.currentTimeMillis());
+
+        given(pointRepository.findUserPointById(userId)).willReturn(userPoint);
+        given(pointRepository.saveUserPoint(userId, chargedUserPoint.point())).willReturn(chargedUserPoint);
+        given(pointRepository.savePointHistory(userId, chargeAmount, CHARGE, anyLong())).willReturn(pointHistory);
+
+        UserPoint result = pointService.chargePoint(userId, chargeAmount);
+
+        assertThat(result)
+                .extracting("id", "point")
+                .contains(userId, chargedUserPoint.point());
+
+        verify(pointRepository, times(1)).findUserPointById(userId);
+        verify(pointRepository, times(1)).saveUserPoint(userId, chargedUserPoint.point());
+        verify(pointRepository, times(1)).savePointHistory(userId, chargeAmount, CHARGE, anyLong());
     }
 }
