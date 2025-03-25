@@ -1,5 +1,7 @@
 package io.hhplus.tdd.point;
 
+import io.hhplus.tdd.exception.NonPositiveChargeAmountException;
+import io.hhplus.tdd.exception.PointLimitExceededException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,11 +17,11 @@ class UserPointTest {
     void charge_shouldThrowNonPositiveChargeAmountException_whenAmountIsZeroOrNegative() {
         UserPoint userPoint = new UserPoint(1L, 1000L, System.currentTimeMillis());
 
-        assertThatThrownBy(userPoint.charge(0L))
+        assertThatThrownBy(() -> userPoint.charge(0L))
                 .isInstanceOf(NonPositiveChargeAmountException.class)
                 .hasMessage("충전 금액이 0 이하일 수 없습니다.");
 
-        assertThatThrownBy(userPoint.charge(-2L))
+        assertThatThrownBy(() -> userPoint.charge(-2L))
                 .isInstanceOf(NonPositiveChargeAmountException.class)
                 .hasMessage("충전 금액이 0 이하일 수 없습니다.");
     }
@@ -31,7 +33,7 @@ class UserPointTest {
         long chargeAmount = 200_000L;
         UserPoint userPoint = new UserPoint(1L, currentPoint, System.currentTimeMillis());
 
-        assertThatThrownBy(userPoint.charge(chargeAmount))
+        assertThatThrownBy(() -> userPoint.charge(chargeAmount))
                 .isInstanceOf(PointLimitExceededException.class)
                 .hasMessage("최대 포인트 한도를 초과합니다. 현재: " + currentPoint + ", 충전: " + chargeAmount + ", 최대: " + MAX_POINT);
     }
