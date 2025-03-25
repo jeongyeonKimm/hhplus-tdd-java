@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,7 +81,7 @@ class PointServiceTest {
 
         given(pointRepository.findUserPointById(userId)).willReturn(userPoint);
         given(pointRepository.saveUserPoint(userId, chargedUserPoint.point())).willReturn(chargedUserPoint);
-        given(pointRepository.savePointHistory(userId, chargeAmount, CHARGE, anyLong())).willReturn(pointHistory);
+        given(pointRepository.savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong())).willReturn(pointHistory);
 
         UserPoint result = pointService.chargePoint(userId, chargeAmount);
 
@@ -90,6 +91,6 @@ class PointServiceTest {
 
         verify(pointRepository, times(1)).findUserPointById(userId);
         verify(pointRepository, times(1)).saveUserPoint(userId, chargedUserPoint.point());
-        verify(pointRepository, times(1)).savePointHistory(userId, chargeAmount, CHARGE, anyLong());
+        verify(pointRepository, times(1)).savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong());
     }
 }
