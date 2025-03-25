@@ -13,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static io.hhplus.tdd.point.TransactionType.*;
+import static io.hhplus.tdd.point.TransactionType.CHARGE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import org.springframework.test.web.servlet.MvcResult;
@@ -41,19 +43,22 @@ class PointControllerTest {
                 .build();
     }
 
-    @DisplayName("특정 유저의 포인트를 조회한다.")
+    @DisplayName("특정 유저 포인트를 조회한다.")
     @Test
     void point() throws Exception {
+        long id = 1L;
+        long point = 1000L;
         long updateMillis = System.currentTimeMillis();
-        UserPoint userPoint = new UserPoint(1L, 1000L, updateMillis);
-        BDDMockito.given(pointService.getUserPoint(1L)).willReturn(userPoint);
+
+        UserPoint userPoint = new UserPoint(id, point, updateMillis);
+        BDDMockito.given(pointService.getUserPoint(id)).willReturn(userPoint);
 
         mockMvc.perform(
-                        get("/point/{id}", 1L)
+                        get("/point/{id}", id)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.point").value(1000L))
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.point").value(point))
                 .andExpect(jsonPath("$.updateMillis").value(updateMillis))
                 .andDo(print());
     }
@@ -62,8 +67,8 @@ class PointControllerTest {
     @Test
     void history() throws Exception {
         long userId = 1L;
-        PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, TransactionType.CHARGE, System.currentTimeMillis());
-        PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, TransactionType.USE, System.currentTimeMillis());
+        PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, CHARGE, System.currentTimeMillis());
+        PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, USE, System.currentTimeMillis());
         List<PointHistory> pointHistories = List.of(pointHistory1, pointHistory2);
 
         given(pointService.getUserPointHistory(1L)).willReturn(pointHistories);

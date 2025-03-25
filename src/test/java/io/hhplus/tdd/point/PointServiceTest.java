@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static io.hhplus.tdd.point.TransactionType.CHARGE;
+import static io.hhplus.tdd.point.TransactionType.USE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -28,16 +30,18 @@ class PointServiceTest {
     @DisplayName("id에 해당하는 사용자 포인트를 조회한다.")
     @Test
     void getUserPoint() {
-        long updateMillis = System.currentTimeMillis();
         long id = 1L;
-        UserPoint userPoint = new UserPoint(id, 1000L, updateMillis);
+        long point = 1000L;
+        long updateMillis = System.currentTimeMillis();
+
+        UserPoint userPoint = new UserPoint(id, point, updateMillis);
         given(pointRepository.findUserPointById(id)).willReturn(userPoint);
 
         UserPoint result = pointService.getUserPoint(id);
 
         assertThat(result)
                 .extracting("id", "point", "updateMillis")
-                .contains(id, 1000L, updateMillis);
+                .contains(id, point, updateMillis);
 
         verify(pointRepository, times(1)).findUserPointById(id);
     }
@@ -46,8 +50,8 @@ class PointServiceTest {
     @Test
     void getUserPointHistory() {
         long userId = 1L;
-        PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, TransactionType.CHARGE, System.currentTimeMillis());
-        PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, TransactionType.USE, System.currentTimeMillis());
+        PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, CHARGE, System.currentTimeMillis());
+        PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, USE, System.currentTimeMillis());
         given(pointRepository.findPointHistoriesByUserId(userId)).willReturn(List.of(pointHistory1, pointHistory2));
 
         List<PointHistory> results = pointService.getUserPointHistory(userId);
@@ -55,8 +59,8 @@ class PointServiceTest {
         assertThat(results)
                 .extracting("id", "userId", "amount", "type")
                 .containsExactlyInAnyOrder(
-                        tuple(2L, userId, 1000L, TransactionType.CHARGE),
-                        tuple(3L, userId, 500L, TransactionType.USE)
+                        tuple(2L, userId, 1000L, CHARGE),
+                        tuple(3L, userId, 500L, USE)
                 );
 
         verify(pointRepository, times(1)).findPointHistoriesByUserId(userId);
