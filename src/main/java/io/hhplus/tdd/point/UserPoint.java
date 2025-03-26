@@ -1,8 +1,8 @@
 package io.hhplus.tdd.point;
 
-import io.hhplus.tdd.exception.NegativePointAmountException;
-import io.hhplus.tdd.exception.NonPositiveChargeAmountException;
-import io.hhplus.tdd.exception.PointLimitExceededException;
+import io.hhplus.tdd.exception.*;
+
+import javax.naming.InsufficientResourcesException;
 
 public record UserPoint(
         long id,
@@ -32,6 +32,19 @@ public record UserPoint(
             throw new PointLimitExceededException(point, amount, MAX_POINT);
         }
 
+        return new UserPoint(id, newPoint, System.currentTimeMillis());
+    }
+
+    public UserPoint use(long amount) {
+        if (amount <= 0) {
+            throw new NonPositiveUseAmountException();
+        }
+
+        if (amount > point) {
+            throw new InsufficientPointException(point, amount);
+        }
+
+        long newPoint = point - amount;
         return new UserPoint(id, newPoint, System.currentTimeMillis());
     }
 }
