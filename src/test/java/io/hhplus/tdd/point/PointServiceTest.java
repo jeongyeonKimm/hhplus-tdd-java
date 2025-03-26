@@ -93,4 +93,30 @@ class PointServiceTest {
         verify(pointRepository, times(1)).saveUserPoint(userId, chargedUserPoint.point());
         verify(pointRepository, times(1)).savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong());
     }
+
+    @DisplayName("보유한 포인트 한도 내에서 0을 초과하는 금액만큼 포인트를 사용한다.")
+    @Test
+    void usePoint() {
+        long userId = 1L;
+        long currentPoint = 500_000L;
+        long useAmount = 300_000L;
+
+        UserPoint userPoint = new UserPoint(userId, currentPoint, System.currentTimeMillis());
+        UserPoint usedUserPoint = userPoint.use(useAmount);
+        PointHistory pointHistory = new PointHistory(2L, userId, useAmount, USE, System.currentTimeMillis());
+
+        given(pointRepository.findUserPointById(userId)).willReturn(userPoint);
+        given(pointRepository.saveUserPoint(userId, usedUserPoint.point())).willReturn(usedUserPoint);
+        given(pointRepository.savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong())).willReturn(pointHistory);
+
+        UserPoint result = pointService.usePoint(userId, useAmount);
+
+        assertThat(result)
+                .extracting("id", "point")
+                .contains(userId, usedUserPoint.point());
+
+        verify(pointRepository, times(1)).findUserPointById(userId);
+        verify(pointRepository, times(1)).saveUserPoint(userId, usedUserPoint.point());
+        verify(pointRepository, times(1)).savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong());
+    }
 }
