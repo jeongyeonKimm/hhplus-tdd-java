@@ -61,6 +61,16 @@ class UserPointTest {
                 .hasMessage("포인트는 음수가 될 수 없습니다.");
     }
 
+    @DisplayName("유저 포인트 생성 시 최대 한도를 초과하면 PointLimitExceededException이 발생한다.")
+    @Test
+    void constructor_shouldThrowException_whenExceedsMax() {
+        long exceededPoint = MAX_POINT * 2;
+
+        assertThatThrownBy(() -> new UserPoint(1L, exceededPoint, System.currentTimeMillis()))
+                .isInstanceOf(PointLimitExceededException.class)
+                .hasMessage("최대 포인트 한도를 초과합니다.");
+    }
+
     @DisplayName("0 이하의 포인트을 사용하려고 하면 NonPositiveUseAmountException이 발생한다.")
     @Test
     void use_shouldThrowNonPositiveUseAmountException_whenAmountIsZeroOrNegative() {

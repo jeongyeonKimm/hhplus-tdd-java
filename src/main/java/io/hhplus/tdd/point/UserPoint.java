@@ -16,6 +16,10 @@ public record UserPoint(
         if (point < 0) {
             throw new NegativePointAmountException();
         }
+
+        if (point > MAX_POINT) {
+            throw new PointLimitExceededException();
+        }
     }
 
     public static UserPoint empty(long id) {
