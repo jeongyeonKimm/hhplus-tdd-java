@@ -1,6 +1,6 @@
 package io.hhplus.tdd.exception;
 
-public class PointLimitExceededException extends RuntimeException {
+public class PointLimitExceededException extends PointException {
 
     public PointLimitExceededException() {
         super("최대 포인트 한도를 초과합니다.");

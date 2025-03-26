@@ -1,9 +1,6 @@
 package io.hhplus.tdd;
 
-import io.hhplus.tdd.exception.InsufficientPointException;
-import io.hhplus.tdd.exception.NonPositiveChargeAmountException;
-import io.hhplus.tdd.exception.NonPositiveUseAmountException;
-import io.hhplus.tdd.exception.PointLimitExceededException;
+import io.hhplus.tdd.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,13 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 class ApiControllerAdvice extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {
-            InsufficientPointException.class,
-            NegativeArraySizeException.class,
-            NonPositiveChargeAmountException.class,
-            NonPositiveUseAmountException.class,
-            PointLimitExceededException.class}
-    )
+    @ExceptionHandler(value = PointException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(Exception e) {
         return ResponseEntity.status(400)
                 .body(new ErrorResponse("400", e.getMessage()));
