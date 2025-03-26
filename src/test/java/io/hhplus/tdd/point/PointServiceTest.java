@@ -27,7 +27,10 @@ class PointServiceTest {
     private PointService pointService;
 
     @Mock
-    private PointRepository pointRepository;
+    private UserPointRepository userPointRepository;
+
+    @Mock
+    private PointHistoryRepository pointHistoryRepository;
 
     @DisplayName("id에 해당하는 사용자 포인트를 조회한다.")
     @Test
@@ -37,7 +40,7 @@ class PointServiceTest {
         long updateMillis = System.currentTimeMillis();
 
         UserPoint userPoint = new UserPoint(id, point, updateMillis);
-        given(pointRepository.findUserPointById(id)).willReturn(userPoint);
+        given(userPointRepository.findUserPointById(id)).willReturn(userPoint);
 
         UserPoint result = pointService.getUserPoint(id);
 
@@ -45,7 +48,7 @@ class PointServiceTest {
                 .extracting("id", "point", "updateMillis")
                 .contains(id, point, updateMillis);
 
-        verify(pointRepository, times(1)).findUserPointById(id);
+        verify(userPointRepository, times(1)).findUserPointById(id);
     }
 
     @DisplayName("유저 아이디로 포인트 충전/사용 내역을 조회한다.")
@@ -54,7 +57,7 @@ class PointServiceTest {
         long userId = 1L;
         PointHistory pointHistory1 = new PointHistory(2L, userId, 1000L, CHARGE, System.currentTimeMillis());
         PointHistory pointHistory2 = new PointHistory(3L, userId, 500L, USE, System.currentTimeMillis());
-        given(pointRepository.findPointHistoriesByUserId(userId)).willReturn(List.of(pointHistory1, pointHistory2));
+        given(pointHistoryRepository.findPointHistoriesByUserId(userId)).willReturn(List.of(pointHistory1, pointHistory2));
 
         List<PointHistory> results = pointService.getUserPointHistory(userId);
 
@@ -65,7 +68,7 @@ class PointServiceTest {
                         tuple(3L, userId, 500L, USE)
                 );
 
-        verify(pointRepository, times(1)).findPointHistoriesByUserId(userId);
+        verify(pointHistoryRepository, times(1)).findPointHistoriesByUserId(userId);
     }
 
     @DisplayName("0 초과이고 이미 보유한 포인트와의 합이 최대 포인트 이하인 금액만큼 포인트를 충전한다.")
@@ -79,9 +82,9 @@ class PointServiceTest {
         UserPoint chargedUserPoint = userPoint.charge(chargeAmount);
         PointHistory pointHistory = new PointHistory(2L, userId, chargeAmount, CHARGE, System.currentTimeMillis());
 
-        given(pointRepository.findUserPointById(userId)).willReturn(userPoint);
-        given(pointRepository.saveUserPoint(userId, chargedUserPoint.point())).willReturn(chargedUserPoint);
-        given(pointRepository.savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong())).willReturn(pointHistory);
+        given(userPointRepository.findUserPointById(userId)).willReturn(userPoint);
+        given(userPointRepository.saveUserPoint(userId, chargedUserPoint.point())).willReturn(chargedUserPoint);
+        given(pointHistoryRepository.savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong())).willReturn(pointHistory);
 
         UserPoint result = pointService.chargePoint(userId, chargeAmount);
 
@@ -89,9 +92,9 @@ class PointServiceTest {
                 .extracting("id", "point")
                 .contains(userId, chargedUserPoint.point());
 
-        verify(pointRepository, times(1)).findUserPointById(userId);
-        verify(pointRepository, times(1)).saveUserPoint(userId, chargedUserPoint.point());
-        verify(pointRepository, times(1)).savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong());
+        verify(userPointRepository, times(1)).findUserPointById(userId);
+        verify(userPointRepository, times(1)).saveUserPoint(userId, chargedUserPoint.point());
+        verify(pointHistoryRepository, times(1)).savePointHistory(eq(userId), eq(chargeAmount), eq(CHARGE), anyLong());
     }
 
     @DisplayName("보유한 포인트 한도 내에서 0을 초과하는 금액만큼 포인트를 사용한다.")
@@ -105,9 +108,9 @@ class PointServiceTest {
         UserPoint usedUserPoint = userPoint.use(useAmount);
         PointHistory pointHistory = new PointHistory(2L, userId, useAmount, USE, System.currentTimeMillis());
 
-        given(pointRepository.findUserPointById(userId)).willReturn(userPoint);
-        given(pointRepository.saveUserPoint(userId, usedUserPoint.point())).willReturn(usedUserPoint);
-        given(pointRepository.savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong())).willReturn(pointHistory);
+        given(userPointRepository.findUserPointById(userId)).willReturn(userPoint);
+        given(userPointRepository.saveUserPoint(userId, usedUserPoint.point())).willReturn(usedUserPoint);
+        given(pointHistoryRepository.savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong())).willReturn(pointHistory);
 
         UserPoint result = pointService.usePoint(userId, useAmount);
 
@@ -115,8 +118,8 @@ class PointServiceTest {
                 .extracting("id", "point")
                 .contains(userId, usedUserPoint.point());
 
-        verify(pointRepository, times(1)).findUserPointById(userId);
-        verify(pointRepository, times(1)).saveUserPoint(userId, usedUserPoint.point());
-        verify(pointRepository, times(1)).savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong());
+        verify(userPointRepository, times(1)).findUserPointById(userId);
+        verify(userPointRepository, times(1)).saveUserPoint(userId, usedUserPoint.point());
+        verify(pointHistoryRepository, times(1)).savePointHistory(eq(userId), eq(useAmount), eq(USE), anyLong());
     }
 }

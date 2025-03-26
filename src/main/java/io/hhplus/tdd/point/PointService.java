@@ -12,34 +12,35 @@ import static io.hhplus.tdd.point.TransactionType.USE;
 @Service
 public class PointService {
 
-    private final PointRepository pointRepository;
+    private final UserPointRepository userPointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     public UserPoint getUserPoint(long id) {
-        return pointRepository.findUserPointById(id);
+        return userPointRepository.findUserPointById(id);
     }
 
     public List<PointHistory> getUserPointHistory(long userId) {
-        return pointRepository.findPointHistoriesByUserId(userId);
+        return pointHistoryRepository.findPointHistoriesByUserId(userId);
     }
 
     public UserPoint chargePoint(long id, long amount) {
-        UserPoint userPoint = pointRepository.findUserPointById(id);
+        UserPoint userPoint = userPointRepository.findUserPointById(id);
 
         UserPoint chargedUserPoint = userPoint.charge(amount);
 
-        pointRepository.saveUserPoint(id, chargedUserPoint.point());
-        pointRepository.savePointHistory(id, amount, CHARGE, System.currentTimeMillis());
+        userPointRepository.saveUserPoint(id, chargedUserPoint.point());
+        pointHistoryRepository.savePointHistory(id, amount, CHARGE, System.currentTimeMillis());
 
         return chargedUserPoint;
     }
 
     public UserPoint usePoint(long id, long amount) {
-        UserPoint userPoint = pointRepository.findUserPointById(id);
+        UserPoint userPoint = userPointRepository.findUserPointById(id);
 
         UserPoint usedUserPoint = userPoint.use(amount);
 
-        pointRepository.saveUserPoint(id, usedUserPoint.point());
-        pointRepository.savePointHistory(id, amount, USE, System.currentTimeMillis());
+        userPointRepository.saveUserPoint(id, usedUserPoint.point());
+        pointHistoryRepository.savePointHistory(id, amount, USE, System.currentTimeMillis());
 
         return usedUserPoint;
     }
