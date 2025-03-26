@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static io.hhplus.tdd.point.TransactionType.CHARGE;
+import static io.hhplus.tdd.point.TransactionType.USE;
+
 @RequiredArgsConstructor
 @Service
 public class PointService {
@@ -19,15 +22,25 @@ public class PointService {
         return pointRepository.findPointHistoriesByUserId(userId);
     }
 
-
     public UserPoint chargePoint(long id, long amount) {
         UserPoint userPoint = pointRepository.findUserPointById(id);
 
         UserPoint chargedUserPoint = userPoint.charge(amount);
 
         pointRepository.saveUserPoint(id, chargedUserPoint.point());
-        pointRepository.savePointHistory(id, amount, TransactionType.CHARGE, System.currentTimeMillis());
+        pointRepository.savePointHistory(id, amount, CHARGE, System.currentTimeMillis());
 
         return chargedUserPoint;
+    }
+
+    public UserPoint usePoint(long id, long amount) {
+        UserPoint userPoint = pointRepository.findUserPointById(id);
+
+        UserPoint usedUserPoint = userPoint.use(amount);
+
+        pointRepository.saveUserPoint(id, usedUserPoint.point());
+        pointRepository.savePointHistory(id, amount, USE, System.currentTimeMillis());
+
+        return usedUserPoint;
     }
 }
