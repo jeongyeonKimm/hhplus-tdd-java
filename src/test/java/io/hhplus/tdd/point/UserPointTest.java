@@ -62,4 +62,44 @@ class UserPointTest {
                 .isInstanceOf(NegativePointAmountException.class)
                 .hasMessage("포인트는 음수가 될 수 없습니다.");
     }
+
+    @DisplayName("0 이하의 포인트을 사용하려고 하면 NonPositiveUseAmountException이 발생한다.")
+    @Test
+    void use_shouldThrowNonPositiveUseAmountException_whenAmountIsZeroOrNegative() {
+        UserPoint userPoint = new UserPoint(1L, 1000L, System.currentTimeMillis());
+
+        assertThatThrownBy(() -> userPoint.use(0L))
+                .isInstanceOf(NonPositiveUseAmountException.class)
+                .hasMessage("사용 금액이 0 이하일 수 없습니다.");
+
+        assertThatThrownBy(() -> userPoint.use(-200L))
+                .isInstanceOf(NonPositiveUseAmountException.class)
+                .hasMessage("사용 금액이 0 이하일 수 없습니다.");
+    }
+
+    @DisplayName("사용하려고 하는 포인트가 보유 중인 포인트를 초과하면 InsufficientPointException이 발생한다.")
+    @Test
+    void use_shouldThrowInsufficientPointException_whenInsufficientPoint() {
+        long currentPoint = 500_000L;
+        long useAmount = 700_000L;
+        UserPoint userPoint = new UserPoint(1L, currentPoint, System.currentTimeMillis());
+
+        assertThatThrownBy(() -> userPoint.use(useAmount))
+                .isInstanceOf(InsufficientPointException.class)
+                .hasMessage("보유한 포인트를 초과합니다. 현재: " + currentPoint + ", 사용: " + useAmount);
+    }
+
+    @DisplayName("보유 중인 포인트 한도 내에서 0보다 큰 금액을 사용하려는 경우 정상적으로 포인트 사용이 된다.")
+    @Test
+    void use() {
+        long currentPoint = 500_000L;
+        long useAmount = 300_000L;
+        UserPoint userPoint = new UserPoint(1L, currentPoint, System.currentTimeMillis());
+
+        UserPoint afterUse = userPoint.use(useAmount);
+
+        long expectedAmount = userPoint.point() - useAmount;
+        assertThat(afterUse.id()).isEqualTo(userPoint.id());
+        assertThat(afterUse.point()).isEqualTo(expectedAmount);
+    }
 }
