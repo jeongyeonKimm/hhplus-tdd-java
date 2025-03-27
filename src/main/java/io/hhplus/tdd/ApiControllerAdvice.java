@@ -1,6 +1,7 @@
 package io.hhplus.tdd;
 
 import io.hhplus.tdd.exception.*;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,6 +14,12 @@ class ApiControllerAdvice extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCustomException(Exception e) {
         return ResponseEntity.status(400)
                 .body(new ErrorResponse("400", e.getMessage()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
+        String message = e.getConstraintViolations().iterator().next().getMessage();
+        return ResponseEntity.badRequest().body(new ErrorResponse("400", message));
     }
 
     @ExceptionHandler(value = Exception.class)
