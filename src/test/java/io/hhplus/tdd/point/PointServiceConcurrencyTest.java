@@ -52,7 +52,7 @@ class PointServiceConcurrencyTest {
         assertThat(userPoint.point()).isEqualTo(chargeAmount * threadCount);
     }
 
-    @DisplayName("한 명의 유저가 100번 사용 요청을 하면 충전 금액 * 100 만큼의 포인트가 차감된다.")
+    @DisplayName("한 명의 유저가 100번 사용 요청을 하면 사용 금액 * 100 만큼의 포인트가 차감된다.")
     @Test
     void usePoint_concurrently() throws InterruptedException {
         int threadCount = 100;
